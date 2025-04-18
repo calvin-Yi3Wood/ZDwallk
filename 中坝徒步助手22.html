@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>万汇中坝森林徒步助手</title>
+    <style>
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            z-index: 1000;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .footer button {
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .panel {
+            position: fixed;
+            bottom: 60px;
+            left: 5%;
+            width: 90%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            padding: 15px;
+            z-index: 1001;
+            max-height: 60%;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .close-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .weather-info {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            border-radius: 5px;
+            z-index: 999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>万汇中坝森林徒步助手</h2>
+    </div>
+    
+    <div id="container"></div>
+    
+    <div class="weather-info">
+        <div id="current-weather">正在获取天气...</div>
+    </div>
+    
+    <div class="footer">
+        <button onclick="showPanel('checklist')">徒步清单</button>
+        <button onclick="showPanel('weather')">天气详情</button>
+        <button onclick="showPanel('safety')">安全指南</button>
+        <button id="location-btn" onclick="shareLocation()">共享位置</button>
+    </div>
+    
+    <!-- 徒步清单面板 -->
+    <div id="checklist-panel" class="panel">
+        <span class="close-btn" onclick="hidePanel('checklist')">×</span>
+        <h3>徒步必备清单</h3>
+        <div>
+            <h4>必备物品</h4>
+            <ul id="essential-items">
+                <li><input type="checkbox"> 充足的饮用水（至少1.5升/人）</li>
+                <li><input type="checkbox"> 防晒霜（SPF50+）</li>
+                <li><input type="checkbox"> 防晒帽</li>
+                <li><input type="checkbox"> 轻便雨衣或折叠雨伞</li>
+                <li><input type="checkbox"> 清凉湿巾和面巾纸</li>
+                <li><input type="checkbox"> 创可贴和简易医药包</li>
+                <li><input type="checkbox"> 充电宝和手机</li>
+                <li><input type="checkbox"> 适合徒步的舒适鞋子</li>
+                <li><input type="checkbox"> 轻便背包</li>
+                <li><input type="checkbox"> 能量食品（坚果、巧克力等）</li>
+            </ul>
+            
+            <h4>升级装备（应对33度高温）</h4>
+            <ul id="upgrade-items">
+                <li><input type="checkbox"> 便携小风扇</li>
+                <li><input type="checkbox"> 防暑降温药品</li>
+                <li><input type="checkbox"> 轻便折叠椅</li>
+                <li><input type="checkbox"> 户外速干毛巾</li>
+                <li><input type="checkbox"> 便携式遮阳伞</li>
+                <li><input type="checkbox"> 运动相机（记录美好瞬间）</li>
+                <li><input type="checkbox"> 昆虫驱避剂</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- 天气详情面板 -->
+    <div id="weather-panel" class="panel">
+        <span class="close-btn" onclick="hidePanel('weather')">×</span>
+        <h3>天气详情</h3>
+        <div id="weather-details">
+            <p>加载中...</p>
+            <!-- 天气API返回的数据将显示在这里 -->
+        </div>
+    </div>
+    
+    <!-- 安全指南面板 -->
+    <div id="safety-panel" class="panel">
+        <span class="close-btn" onclick="hidePanel('safety')">×</span>
+        <h3>徒步安全指南</h3>
+        <div>
+            <h4>高温天气注意事项</h4>
+            <ul>
+                <li>避免在中午时分（11:00-15:00）剧烈运动</li>
+                <li>每30分钟补充水分一次</li>
+                <li>出现头晕、恶心等症状时立即休息并寻求帮助</li>
+                <li>注意观察孩子的精神状态，防止中暑</li>
+            </ul>
+            
+            <h4>紧急联系电话</h4>
+            <ul>
+                <li>幼儿园班主任：<a href="tel:+1234567890">点击拨打</a></li>
+                <li>紧急救援：<a href="tel:120">120</a></li>
+                <li>森林公安：<a href="tel:12119">12119</a></li>
+            </ul>
+            
+            <h4>雨天预防措施</h4>
+            <ul>
+                <li>随时关注天气变化，听到雷声应立即寻找安全场所</li>
+                <li>雨天路滑，放慢步伐，特别注意保护幼儿安全</li>
+                <li>避免在大雨时继续行进，可在安全地点暂时休息</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 百度地图API -->
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=yqovw7vuxUYvfgDFC3O3mVlisyjhWgWz"></script>
+    <script>
+        // 初始化地图
+        var map = new BMap.Map("container");
+        var point = new BMap.Point(104.069, 30.657); // 这里需要替换为实际的中坝森林的坐标
+        map.centerAndZoom(point, 15);
+        map.enableScrollWheelZoom();
+        map.addControl(new BMap.NavigationControl());
+        map.addControl(new BMap.ScaleControl());
+        map.addControl(new BMap.GeolocationControl());
+        
+        // 徒步路线坐标点（这里需要替换为实际的路线坐标）
+        var pathPoints = [
+            // 这里添加路线的坐标点，通过百度地图坐标拾取器获取
+            new BMap.Point(104.069, 30.657),
+            new BMap.Point(104.075, 30.660),
+            // ... 更多坐标点
+        ];
+        
+        // 绘制路线
+        var polyline = new BMap.Polyline(pathPoints, {
+            strokeColor: "#3388ff",
+            strokeWeight: 6,
+            strokeOpacity: 0.8
+        });
+        map.addOverlay(polyline);
+        
+        // 定位功能
+        function shareLocation() {
+            var geolocation = new BMap.Geolocation();
+            geolocation.getCurrentPosition(function(r) {
+                if(this.getStatus() == BMAP_STATUS_SUCCESS) {
+                    // 创建位置标记
+                    var marker = new BMap.Marker(r.point);
+                    map.addOverlay(marker);
+                    
+                    // 移动地图中心到当前位置
+                    map.panTo(r.point);
+                    
+                    // 更改按钮文字
+                    document.getElementById('location-btn').innerText = '已共享位置';
+                    
+                    // 可以在这里添加位置信息上传到服务器的代码，让其他用户看到
+                } else {
+                    alert('定位失败，请检查位置权限是否开启');
+                }
+            }, {enableHighAccuracy: true});
+        }
+        
+        // 模拟天气数据（实际应用中需要接入天气API）
+        function getWeather() {
+            // 这里应该是天气API的调用
+            // 为演示目的，使用模拟数据
+            var weatherInfo = {
+                temperature: '33°C',
+                humidity: '65%',
+                description: '晴转多云',
+                forecast: [
+                    {time: '10:00', temp: '30°C', desc: '晴'},
+                    {time: '12:00', temp: '33°C', desc: '晴'},
+                    {time: '14:00', temp: '33°C', desc: '多云'},
+                    {time: '16:00', temp: '32°C', desc: '多云'},
+                    {time: '18:00', temp: '29°C', desc: '小雨'}
+                ]
+            };
+            
+            document.getElementById('current-weather').innerHTML = 
+                weatherInfo.temperature + ' ' + weatherInfo.description;
+            
+            var weatherDetailsHtml = '<p>当前温度：' + weatherInfo.temperature + '</p>' +
+                '<p>湿度：' + weatherInfo.humidity + '</p>' +
+                '<p>天气：' + weatherInfo.description + '</p>' +
+                '<h4>今日预报</h4><ul>';
+            
+            weatherInfo.forecast.forEach(function(item) {
+                weatherDetailsHtml += '<li>' + item.time + '：' + item.temp + ' ' + item.desc + '</li>';
+            });
+            
+            weatherDetailsHtml += '</ul>';
+            document.getElementById('weather-details').innerHTML = weatherDetailsHtml;
+        }
+        
+        // 面板显示控制
+        function showPanel(type) {
+            hideAllPanels();
+            document.getElementById(type + '-panel').style.display = 'block';
+        }
+        
+        function hidePanel(type) {
+            document.getElementById(type + '-panel').style.display = 'none';
+        }
+        
+        function hideAllPanels() {
+            var panels = document.getElementsByClassName('panel');
+            for(var i = 0; i < panels.length; i++) {
+                panels[i].style.display = 'none';
+            }
+        }
+        
+        // 页面加载完成后执行
+        window.onload = function() {
+            getWeather(); // 获取天气信息
+            
+            // 自动触发一次定位
+            setTimeout(function() {
+                shareLocation();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
